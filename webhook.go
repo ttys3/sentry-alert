@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 )
 
 type event struct {

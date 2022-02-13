@@ -43,7 +43,7 @@ func init() {
 	cobra.OnInitialize(loadConfig)
 	slaxyCmd.PersistentFlags().StringP("config", "c", "", "path to config file if any")
 	slaxyCmd.PersistentFlags().DurationP("grace-period", "g", 60*time.Second, "grace period for stopping the server")
-	slaxyCmd.PersistentFlags().StringP("addr", "a", "localhost:3000", "listen address")
+	slaxyCmd.PersistentFlags().StringP("addr", "a", ":3000", "listen address")
 	slaxyCmd.PersistentFlags().StringP("token", "t", "", "slack token")
 	slaxyCmd.PersistentFlags().StringP("channel", "n", "", "slack channel")
 	slaxyCmd.PersistentFlags().StringSliceP("excluded-fields", "e", nil, "excluded sentry fields")

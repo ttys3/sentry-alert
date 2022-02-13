@@ -36,7 +36,7 @@ $ go install github.com/innogames/slaxy/slaxy
 ```
 grace-period: 60s
 addr: 127.0.0.1:3000
-bot-token: xoxb-###-###-###
+token: xoxb-###-###-###
 channel: xxx
 excluded-fields:
   - ^sentry:.*$

@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/slack-go/slack"
 	"github.com/pkg/errors"
+	"github.com/slack-go/slack"
 )
 
 type handler func(l net.Listener)
@@ -17,9 +17,9 @@ type handler func(l net.Listener)
 // Config holds all config values
 type Config struct {
 	GracePeriod    time.Duration `mapstructure:"grace-period"`
-	Addr           string
-	Token          string   `mapstructure:"token"`
-	ExcludedFields []string `mapstructure:"excluded-fields"`
+	Addr           string        `mapstructure:"addr"`
+	Token          string        `mapstructure:"token"`
+	ExcludedFields []string      `mapstructure:"excluded-fields"`
 }
 
 // server types

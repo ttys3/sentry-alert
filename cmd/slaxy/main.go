@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -11,6 +12,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	ServiceName string
+	Version     string
+	BuildTime   string
 )
 
 var (
@@ -25,58 +32,13 @@ var (
 	v        = viper.New()
 	logger   = logrus.New()
 	slaxyCmd = &cobra.Command{
-		Use:   "slaxy",
-		Long:  splash,
-		Short: "Sentry webhooks to slack message converter proxy",
-		Run:   run,
+		Use:     "slaxy",
+		Long:    splash,
+		Short:   "Sentry webhooks to slack message converter proxy",
+		Run:     run,
+		Version: fmt.Sprintf("%s %s %s", ServiceName, Version, BuildTime),
 	}
 )
-
-// logrusLogger wraps a logrus logger for compatibility with the slaxy library
-type logrusLogger struct {
-	slaxy.Logger
-	l *logrus.Logger
-}
-
-// Debug logs debug messages
-func (l *logrusLogger) Debug(msg string) {
-	l.l.Debug(msg)
-}
-
-// Debugf logs debug messages
-func (l *logrusLogger) Debugf(msg string, args ...interface{}) {
-	l.l.Debugf(msg, args...)
-}
-
-// Info logs debug messages
-func (l *logrusLogger) Info(msg string) {
-	l.l.Info(msg)
-}
-
-// Infof logs debug messages
-func (l *logrusLogger) Infof(msg string, args ...interface{}) {
-	l.l.Infof(msg, args...)
-}
-
-// Warn logs debug messages
-func (l *logrusLogger) Warn(msg string) {
-	l.l.Warn(msg)
-}
-
-// Warnf logs debug messages
-func (l *logrusLogger) Warnf(msg string, args ...interface{}) {
-	l.l.Warnf(msg, args...)
-}
-
-// Error logs debug messages
-func (l *logrusLogger) Error(msg string) {
-	l.l.Error(msg)
-}
-
-// Errorf logs debug messages
-func (l *logrusLogger) Errorf(msg string, args ...interface{}) {
-	l.l.Errorf(msg, args...)
-}
 
 // init initializes the CLI
 func init() {
@@ -142,6 +104,9 @@ func loadConfig() {
 		v.AddConfigPath("/etc/slaxy")
 		v.AddConfigPath(".")
 	}
+
+	viper.SetEnvPrefix("SLAXY")
+	viper.AutomaticEnv()
 
 	// read config
 	err = v.ReadInConfig()

@@ -7,15 +7,15 @@ BUILD_TIME := $(shell date +%Y%m%d-%H%M%S)
 VERSION_PKG := main
 LD_FLAGS := "-w -s -X $(VERSION_PKG).ServiceName=$(NAME) -X $(VERSION_PKG).Version=$(VERSION) -X $(VERSION_PKG).BuildTime=$(BUILD_TIME)"
 
-all: bin
+all: $(NAME)
 
-bin:
+$(NAME):
 	CGO_ENABLED=0 go build -ldflags=$(LD_FLAGS) ./cmd/$(NAME)/
 
 clean:
 	-rm -f $(NAME)
 
-podman/build: clean $(BIN)
+podman/build: $(NAME)
 	podman build -t $(NAME):$(TAG) -f Dockerfile .
 
 podman/push: podman/build

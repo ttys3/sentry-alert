@@ -12,6 +12,8 @@ RUN chmod +x /tini
 WORKDIR /usr/local/bin/
 
 ENV TZ=Asia/Shanghai \
+SLAXY_LOG_LEVEL=info \
+SLAXY_LOG_FORMAT=json \
 SLAXY_TOKEN="" \
 SLAXY_ADDR=":8080" \
 SLAXY_GRACE_PERIOD="6s" \

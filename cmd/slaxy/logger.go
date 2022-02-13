@@ -1,9 +1,50 @@
 package main
 
 import (
+	"fmt"
 	"github.com/innogames/slaxy"
 	"github.com/sirupsen/logrus"
+	"os"
+	"path"
+	"runtime"
 )
+
+var logger = logrus.New()
+
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	if os.Getenv("SLAXY_LOG_FORMAT") == "json" {
+		logger.SetFormatter(&logrus.JSONFormatter{
+			TimestampFormat: "2006-01-02 15:04:05Z07:00",
+			CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+				filename := path.Base(f.File)
+				return fmt.Sprintf("%s()", f.Function), fmt.Sprintf("%s:%d", filename, f.Line)
+			},
+		})
+	} else {
+		logger.SetFormatter(&logrus.TextFormatter{
+			FullTimestamp:   true,
+			TimestampFormat: "2006-01-02 15:04:05Z07:00",
+			CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+				filename := path.Base(f.File)
+				return fmt.Sprintf("%s()", f.Function), fmt.Sprintf("%s:%d", filename, f.Line)
+			},
+		})
+	}
+
+	// Output to stdout instead of the default stderr
+	// Can be any io.Writer, see below for File example
+	logger.SetOutput(os.Stdout)
+
+	logger.SetReportCaller(true)
+
+	var level = new(logrus.Level)
+	if err := level.UnmarshalText([]byte(os.Getenv("SLAXY_LOG_LEVEL"))); err != nil {
+		logger.SetLevel(logrus.InfoLevel)
+	} else {
+		logger.SetLevel(*level)
+	}
+}
 
 // logrusLogger wraps a logrus logger for compatibility with the slaxy library
 type logrusLogger struct {

@@ -84,7 +84,7 @@ func (s *server) setup(addr string, handler handler) error {
 	client := slack.New(s.cfg.Token)
 	_, err := client.AuthTest()
 	if err != nil {
-		return err
+		return fmt.Errorf("slack auth failed, err=%w", err)
 	}
 	s.slack = client
 

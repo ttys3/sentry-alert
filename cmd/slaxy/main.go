@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/innogames/slaxy"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -21,8 +21,7 @@ var (
 )
 
 var (
-	cfg slaxy.Config
-
+	cfg    slaxy.Config
 	splash = `  _________.__                        
  /   _____/|  | _____  ___  ______.__.
  \_____  \ |  | \__  \ \  \/  <   |  |
@@ -30,7 +29,6 @@ var (
 /_______  /|____(____  /__/\_ \/ ____|
         \/           \/      \/\/     `
 	v        = viper.New()
-	logger   = logrus.New()
 	slaxyCmd = &cobra.Command{
 		Use:     "slaxy",
 		Long:    splash,
@@ -105,13 +103,19 @@ func loadConfig() {
 		v.AddConfigPath(".")
 	}
 
-	viper.SetEnvPrefix("SLAXY")
-	viper.AutomaticEnv()
+	v.SetEnvPrefix("SLAXY")
+	v.AutomaticEnv()
 
 	// read config
 	err = v.ReadInConfig()
-	if err != nil {
+	targetErr := viper.ConfigFileNotFoundError{}
+	isNotFound := errors.As(err, &targetErr)
+	if err != nil && !isNotFound {
 		logger.WithError(err).Fatal("Could not read config")
+	}
+
+	if isNotFound {
+		logger.Info("could not config from file, will only read from environment vars")
 	}
 
 	// parse config
@@ -119,6 +123,7 @@ func loadConfig() {
 	if err != nil {
 		logger.WithError(err).Fatal("Could not parse config")
 	}
+	logger.WithField("config", cfg).Info("config loaded")
 }
 
 // handleInterrupt takes care of signals and graceful shutdowns

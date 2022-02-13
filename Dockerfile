@@ -2,7 +2,12 @@ FROM ubuntu:21.10
 
 COPY slaxy  /usr/local/bin/
 
-RUN mkdir /etc/slaxy
+RUN mkdir /etc/slaxy; \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates; \
+    update-ca-certificates -f; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+    apt autoremove -y; \
+    rm -rf /var/lib/apt/lists/*
 
 # Add Tini
 ENV TINI_VERSION v0.19.0

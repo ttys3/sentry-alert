@@ -32,11 +32,13 @@ func (s *server) handleWebhook(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// the last part is slack channel id
+	// /webhook/sentry/:SlackChannelID
 	parts := strings.Split(req.RequestURI, "/")
-	channel := parts[1]
-	if len(parts) > 2 || channel == "" {
-		w.WriteHeader(404)
-
+	channel := parts[len(parts)-1]
+	if channel == "" {
+		w.WriteHeader(400)
+		w.Write([]byte("empty slack channel ID"))
 		return
 	}
 
@@ -65,6 +67,7 @@ func (s *server) handleWebhook(w http.ResponseWriter, req *http.Request) {
 	attachment := s.createAttachment(hook)
 
 	// post the message
+	s.logger.Debugf("begin post message to slack, channel=%v attachment=%v", channel, attachment)
 	channelID, timestamp, err := s.slack.PostMessage(channel, slack.MsgOptionAttachments(attachment))
 	if err != nil {
 		w.WriteHeader(500)

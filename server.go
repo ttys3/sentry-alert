@@ -110,7 +110,7 @@ func (s *server) handleListener(l net.Listener, addr string, handler handler) {
 // handleWeb handles all incoming connections to the webhook server
 func (s *server) handleWeb(l net.Listener) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", s.handleWebhook)
+	mux.HandleFunc("/webhook/sentry/", s.handleWebhook)
 
 	s.srv = &http.Server{
 		Handler: mux,

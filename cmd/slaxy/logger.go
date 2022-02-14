@@ -40,8 +40,11 @@ func init() {
 
 	var level = new(logrus.Level)
 	if err := level.UnmarshalText([]byte(os.Getenv("SLAXY_LOG_LEVEL"))); err != nil {
-		logger.SetLevel(logrus.InfoLevel)
+		*level = logrus.InfoLevel
+		logger.Infof("using default log level=%v", *level)
+		logger.SetLevel(*level)
 	} else {
+		logger.Infof("set log level=%v", *level)
 		logger.SetLevel(*level)
 	}
 }

@@ -3,7 +3,7 @@ package slaxy
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -89,7 +89,7 @@ func (s *server) handleWebhook(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// read body
-	buf, err := ioutil.ReadAll(req.Body)
+	buf, err := io.ReadAll(req.Body)
 	if err != nil {
 		w.WriteHeader(400)
 		s.logger.Errorf("Could not read response body: %s", err.Error())
@@ -113,7 +113,7 @@ func (s *server) handleWebhook(w http.ResponseWriter, req *http.Request) {
 	s.logger.Debugf("parse webhook payload success, payload=%+v", hook)
 
 	// create message attachment
-	attachment := s.createAttachment(hook)
+	attachment := s.createAttachment(&hook)
 
 	// post the message
 	s.logger.Debugf("begin post message to slack, channel=%v attachment=%v", channel, attachment)
@@ -130,7 +130,7 @@ func (s *server) handleWebhook(w http.ResponseWriter, req *http.Request) {
 }
 
 // createAttachment will create the slack message attachment
-func (s *server) createAttachment(hook webhook) slack.Attachment {
+func (s *server) createAttachment(hook *webhook) slack.Attachment {
 	// default fields
 	fields := []slack.AttachmentField{
 		{

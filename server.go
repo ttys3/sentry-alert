@@ -123,7 +123,7 @@ func (s *server) handleWeb(l net.Listener) {
 	err := s.srv.Serve(l)
 
 	// server closed abnormally
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		err = errors.Wrap(err, "server failed")
 		s.errChan <- err
 	}

@@ -52,6 +52,8 @@ func (s *server) handleWebhook(w http.ResponseWriter, req *http.Request) {
 	}
 	defer req.Body.Close()
 
+	s.logger.Debugf("read request payload success, body=%s", string(buf))
+
 	// parse webhook
 	var hook webhook
 

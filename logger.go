@@ -14,8 +14,7 @@ type Logger interface {
 }
 
 // nullLogger is a logger that does nothing
-type nullLogger struct {
-}
+type nullLogger struct{}
 
 // NewNullLogger returns a new instance of a logger that does nothing
 func NewNullLogger() Logger {

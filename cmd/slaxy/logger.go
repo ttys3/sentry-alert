@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/innogames/slaxy"
-	"github.com/sirupsen/logrus"
 	"os"
 	"path"
 	"runtime"
+
+	"github.com/innogames/slaxy"
+	"github.com/sirupsen/logrus"
 )
 
 var logger = logrus.New()
@@ -38,7 +39,7 @@ func init() {
 
 	logger.SetReportCaller(true)
 
-	var level = new(logrus.Level)
+	level := new(logrus.Level)
 	if err := level.UnmarshalText([]byte(os.Getenv("SLAXY_LOG_LEVEL"))); err != nil {
 		*level = logrus.InfoLevel
 		logger.Infof("using default log level=%v", *level)

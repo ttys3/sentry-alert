@@ -10,17 +10,63 @@ import (
 	"github.com/slack-go/slack"
 )
 
-type event struct {
-	Tags [][]string
+type webhook struct {
+	ProjectName     string   `json:"project_name"` // "nexus-tracker-test"
+	Message         string   `json:"message"`      // most time this is empty
+	ID              string   `json:"id"`
+	Culprit         string   `json:"culprit"`
+	ProjectSlug     string   `json:"project_slug"`
+	URL             string   `json:"url"`
+	Level           string   `json:"level"`            // "error"
+	TriggeringRules []string `json:"triggering_rules"` // eg: [ "Send a notification for new issues" ]
+
+	Event sentryEvent
 }
 
-type webhook struct {
-	ProjectName string `json:"project_name"`
-	Message     string
-	Culprit     string
-	URL         string
-	Level       string
-	Event       event
+type sentryEvent struct {
+	Culprit     string `json:"culprit"`     // the same as parent culprit
+	Title       string `json:"title"`       // "*fmt.wrapError: this is an test error, err=file does not exist"
+	EventID     string `json:"event_id"`    // "fec9f96296cb47d89e652d183e2752cf"
+	Environment string `json:"environment"` // also event.tags ["environment", "develop"]
+	Platform    string `json:"platform"`    //  "go", "rust"
+	Version     string `json:"version"`
+	Location    string `json:"location"` // "/home/ttys3/repo/go/sentry-go-test/main.go"
+	Logger      string `json:"logger"`
+	Type        string `json:"type"` // "error"
+
+	Metadata sentryEvtMetadata `json:"metadata"`
+	Tags     []sentryTag
+
+	Timestamp float64 `json:"timestamp"`
+	Received  float64 `json:"received"`
+
+	Level string `json:"level"` //  also event.tags ["level", "error"]
+
+	Project int    `json:"project"`
+	Release string `json:"release"` // also event.tags ["sentry:release", "v1.1.0"]
+
+	User sentryUser `json:"user,omitempty"`
+}
+
+type sentryEvtMetadata struct {
+	Function string `json:"function"`
+	Type     string `json:"type"`
+	Value    string `json:"value"`
+	Filename string `json:"filename"`
+}
+
+// sentryTag is an array as two elements, in [key, value] format
+type sentryTag [2]string
+
+type sentryUser struct {
+	Username  string `json:"username"`
+	IPAddress string `json:"ip_address"`
+	Geo       struct {
+		Region      string `json:"region"`
+		CountryCode string `json:"country_code"`
+	} `json:"geo"`
+	ID    string `json:"id"`
+	Email string `json:"email"`
 }
 
 // handleWebhook handles one webhook request
@@ -64,6 +110,7 @@ func (s *server) handleWebhook(w http.ResponseWriter, req *http.Request) {
 
 		return
 	}
+	s.logger.Debugf("parse webhook payload success, payload=%+v", hook)
 
 	// create message attachment
 	attachment := s.createAttachment(hook)
@@ -102,10 +149,34 @@ func (s *server) createAttachment(hook webhook) slack.Attachment {
 		},
 	}
 
+	if hook.Event.Location != "" {
+		fields = append(fields, slack.AttachmentField{
+			Title: "Location",
+			Value: hook.Event.Location,
+		})
+	}
+
+	if hook.Event.Environment != "" {
+		fields = append(fields, slack.AttachmentField{
+			Title: "Environment",
+			Value: hook.Event.Environment,
+			Short: true,
+		})
+	}
+
+	if hook.Event.Release != "" {
+		fields = append(fields, slack.AttachmentField{
+			Title: "Release",
+			Value: hook.Event.Release,
+			Short: true,
+		})
+	}
+
 	// put all sentry tags as attachment fields
 	for _, tag := range hook.Event.Tags {
-		// skip the default fields
-		if tag[0] == "culprit" || tag[0] == "project" || tag[0] == "level" {
+		// skip the default fields we already set
+		if tag[0] == "culprit" || tag[0] == "project" || tag[0] == "level" ||
+			tag[0] == "location" || tag[0] == "release" || tag[0] == "sentry:release" {
 			continue
 		}
 
@@ -122,10 +193,20 @@ func (s *server) createAttachment(hook webhook) slack.Attachment {
 		})
 	}
 
-	lines := strings.Split(hook.Message, "\n")
+	var title string
+	// message is empty most of the time
+	if hook.Message != "" {
+		lines := strings.Split(hook.Message, "\n")
+		title = lines[0]
+	}
+
+	if title == "" {
+		// fallback to event.title
+		title = fmt.Sprintf("%s %s", hook.Event.Title)
+	}
 
 	return slack.Attachment{
-		Text:   fmt.Sprintf("<%s|*%s*>", hook.URL, lines[0]),
+		Text:   fmt.Sprintf("<%s|*%s*>", hook.URL, title),
 		Color:  "#f43f20",
 		Fields: fields,
 	}

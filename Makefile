@@ -20,3 +20,10 @@ podman/build: $(NAME)
 
 podman/push: podman/build
 	podman push $(NAME):$(TAG) docker.io/80x86/$(NAME):$(TAG)
+
+lint:
+	golangci-lint run  -v
+
+fmt:
+	command -v gofumpt || (WORK=$(shell pwd) && cd /tmp && GO111MODULE=on go get mvdan.cc/gofumpt && cd $(WORK))
+	gofumpt -w -s -d .

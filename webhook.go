@@ -37,15 +37,17 @@ type sentryEvent struct {
 	Metadata sentryEvtMetadata `json:"metadata"`
 	Tags     []sentryTag
 
-	Timestamp float64 `json:"timestamp"`
-	Received  float64 `json:"received"`
+	Timestamp float64 `json:"timestamp"` // 1645672116.893372
+	Received  float64 `json:"received"`  // 1645672117.030224
 
 	Level string `json:"level"` //  also event.tags ["level", "error"]
 
 	Project int    `json:"project"`
 	Release string `json:"release"` // also event.tags ["sentry:release", "v1.1.0"]
 
-	User sentryUser `json:"user,omitempty"`
+	User      sentryUser `json:"user,omitempty"`
+	Sdk       Sdk        `json:"sdk"`
+	Exception Exception  `json:"exception"`
 }
 
 type sentryEvtMetadata struct {
@@ -67,6 +69,47 @@ type sentryUser struct {
 	} `json:"geo"`
 	ID    string `json:"id"`
 	Email string `json:"email"`
+}
+
+type Sdk struct {
+	Version string `json:"version"`
+	Name    string `json:"name"`
+}
+
+type Exception struct {
+	Values []ExceptionValue `json:"values"`
+}
+
+type ExceptionValue struct {
+	Stacktrace Stacktrace `json:"stacktrace"`
+	Type       string     `json:"type"`
+	Value      string     `json:"value"`
+	Mechanism  struct {
+		Type    string `json:"type"`
+		Handled bool   `json:"handled"`
+	} `json:"mechanism"`
+}
+
+type Stacktrace struct {
+	Frames []StacktraceFrame `json:"frames"`
+}
+
+type StacktraceFrame struct {
+	AbsPath     string        `json:"abs_path"`
+	PreContext  []interface{} `json:"pre_context"`
+	PostContext []interface{} `json:"post_context"`
+	InApp       bool          `json:"in_app"`
+	Lineno      int           `json:"lineno"`
+	Filename    string        `json:"filename"`
+	ContextLine string        `json:"context_line"`
+}
+
+type Request struct {
+	URL                 string                 `json:"url"`
+	Headers             [][]string             `json:"headers"` // "Referer", "Origin"
+	Data                map[string]interface{} `json:"data"`
+	Method              string                 `json:"method"`
+	InferredContentType string                 `json:"inferred_content_type"`
 }
 
 // handleWebhook handles one webhook request
@@ -202,7 +245,7 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 
 	if title == "" {
 		// fallback to event.title
-		title = fmt.Sprintf("%s %s", hook.Event.Title)
+		title = fmt.Sprintf("%s %s", hook.Event.Title, hook.Event.Location)
 	}
 
 	return slack.Attachment{

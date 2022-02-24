@@ -109,7 +109,7 @@ func (s *StacktraceFrame) String() string {
 	if s == nil {
 		return ""
 	}
-	return fmt.Sprintf("filename=%v line=%v abs_path=%v context_line=%v",
+	return fmt.Sprintf("filename: %v line: %v\nabs_path: %v context_line:\n```\n%v\n```\n",
 		s.Filename, s.Lineno, s.AbsPath, s.ContextLine)
 }
 
@@ -201,25 +201,18 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 		},
 	}
 
+	if hook.Event.Location != "" {
+		fields = append(fields, slack.AttachmentField{
+			Title: "Location",
+			Value: hook.Event.Location,
+		})
+	}
+
 	if hook.Event.Timestamp != 0 {
 		fields = append(fields, slack.AttachmentField{
 			Title: "Timestamp",
 			Value: time.Unix(int64(int(hook.Event.Timestamp)), 0).Format(time.RFC3339),
 			Short: true,
-		})
-	}
-
-	if len(hook.Event.Exception.Values) > 0 && len(hook.Event.Exception.Values[0].Stacktrace.Frames) > 0 {
-		fields = append(fields, slack.AttachmentField{
-			Title: "Stacktrace",
-			Value: hook.Event.Exception.Values[0].Stacktrace.Frames[0].String(),
-		})
-	}
-
-	if hook.Event.Location != "" {
-		fields = append(fields, slack.AttachmentField{
-			Title: "Location",
-			Value: hook.Event.Location,
 		})
 	}
 
@@ -236,6 +229,13 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 			Title: "Release",
 			Value: hook.Event.Release,
 			Short: true,
+		})
+	}
+
+	if len(hook.Event.Exception.Values) > 0 && len(hook.Event.Exception.Values[0].Stacktrace.Frames) > 0 {
+		fields = append(fields, slack.AttachmentField{
+			Title: "Stacktrace",
+			Value: hook.Event.Exception.Values[0].Stacktrace.Frames[0].String(),
 		})
 	}
 

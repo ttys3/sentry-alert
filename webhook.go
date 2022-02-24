@@ -109,7 +109,7 @@ func (s *StacktraceFrame) String() string {
 	if s == nil {
 		return ""
 	}
-	return fmt.Sprintf("filename: %v line: %v\nabs_path: %v context_line:\n```\n%v\n```\n",
+	return fmt.Sprintf("filename: `%v`\tline: `%v`\nabs_path: `%v`\ncontext_line:\n```\n%v\n```\n",
 		s.Filename, s.Lineno, s.AbsPath, s.ContextLine)
 }
 
@@ -205,6 +205,7 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 		fields = append(fields, slack.AttachmentField{
 			Title: "Location",
 			Value: hook.Event.Location,
+			Short: true,
 		})
 	}
 
@@ -269,7 +270,7 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 
 	if title == "" {
 		// fallback to event.title
-		title = fmt.Sprintf("%s %s", hook.Event.Title, hook.Event.Location)
+		title = fmt.Sprintf("[%s] %s", hook.Event.Location, hook.Event.Title)
 	}
 
 	return slack.Attachment{

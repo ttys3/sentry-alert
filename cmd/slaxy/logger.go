@@ -57,8 +57,8 @@ type logrusLogger struct {
 }
 
 // Debug logs debug messages
-func (l *logrusLogger) Debug(msg string) {
-	l.l.Debug(msg)
+func (l *logrusLogger) Debug(args ...interface{}) {
+	l.l.Debug(args...)
 }
 
 // Debugf logs debug messages
@@ -67,8 +67,8 @@ func (l *logrusLogger) Debugf(msg string, args ...interface{}) {
 }
 
 // Info logs debug messages
-func (l *logrusLogger) Info(msg string) {
-	l.l.Info(msg)
+func (l *logrusLogger) Info(args ...interface{}) {
+	l.l.Info(args...)
 }
 
 // Infof logs debug messages
@@ -77,8 +77,8 @@ func (l *logrusLogger) Infof(msg string, args ...interface{}) {
 }
 
 // Warn logs debug messages
-func (l *logrusLogger) Warn(msg string) {
-	l.l.Warn(msg)
+func (l *logrusLogger) Warn(args ...interface{}) {
+	l.l.Warn(args...)
 }
 
 // Warnf logs debug messages
@@ -87,8 +87,8 @@ func (l *logrusLogger) Warnf(msg string, args ...interface{}) {
 }
 
 // Error logs debug messages
-func (l *logrusLogger) Error(msg string) {
-	l.l.Error(msg)
+func (l *logrusLogger) Error(args ...interface{}) {
+	l.l.Error(args...)
 }
 
 // Errorf logs debug messages

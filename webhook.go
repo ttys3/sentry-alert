@@ -109,7 +109,7 @@ func (s *StacktraceFrame) String() string {
 	if s == nil {
 		return ""
 	}
-	return fmt.Sprintf("filename: `%v`\tline: `%v`\nabs_path: `%v`\ncontext_line:\n```\n%v\n```\n",
+	return fmt.Sprintf("filename: `%v`\nline: `%v`\nabs_path: `%v`\ncontext_line:\n```\n%v\n```\n",
 		s.Filename, s.Lineno, s.AbsPath, s.ContextLine)
 }
 

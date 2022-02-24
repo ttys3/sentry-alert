@@ -242,21 +242,23 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 
 	// put all sentry tags as attachment fields
 	for _, tag := range hook.Event.Tags {
+		tagKey := tag[0]
+		tagValue := tag[1]
 		// skip the default fields we already set
-		if tag[0] == "culprit" || tag[0] == "project" || tag[0] == "level" ||
-			tag[0] == "location" || tag[0] == "release" || tag[0] == "sentry:release" {
+		if tagKey == "culprit" || tagKey == "project" || tagKey == "level" ||
+			tagKey == "location" || tagKey == "environment" || tagKey == "release" || tagKey == "sentry:release" {
 			continue
 		}
 
 		// skip everything that is user-excluded
-		if s.isExcluded(tag[0]) {
+		if s.isExcluded(tagKey) {
 			continue
 		}
 
-		title := strings.Title(strings.ReplaceAll(tag[0], "_", " "))
+		title := strings.Title(strings.ReplaceAll(tagKey, "_", " "))
 		fields = append(fields, slack.AttachmentField{
 			Title: title,
-			Value: tag[1],
+			Value: tagValue,
 			Short: true,
 		})
 	}

@@ -1,10 +1,8 @@
 package slaxy
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"net/http"
 	"strings"
@@ -107,24 +105,12 @@ type StacktraceFrame struct {
 	ContextLine string        `json:"context_line"`
 }
 
-var DefaultTemplate = "filename: `{{ .Filename }}`\nline: `{{ .Lineno }}`\nabs_path: `{{ .AbsPath }}`\ncontext_line:\n```\n{{ .ContextLine }}\n```\n"
-
 func (s *StacktraceFrame) String() string {
 	if s == nil {
 		return ""
 	}
-	// return fmt.Sprintf("filename: `%v`\nline: `%v`\nabs_path: `%v`\ncontext_line:\n```\n%v\n```\n",
-	// 	s.Filename, s.Lineno, s.AbsPath, s.ContextLine)
-
-	tmp, err := template.New("stacktrace").Parse(DefaultTemplate)
-	if err != nil {
-		return ""
-	}
-	var buf bytes.Buffer
-	if err := tmp.Execute(&buf, s); err != nil {
-		return ""
-	}
-	return buf.String()
+	return fmt.Sprintf("filename: `%v`\nline: `%v`\nabs_path: `%v`\ncontext_line:\n```\n%v\n```\n",
+		s.Filename, s.Lineno, s.AbsPath, s.ContextLine)
 }
 
 type Request struct {

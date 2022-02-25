@@ -3,6 +3,7 @@ package slaxy
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
 	"strings"
@@ -276,7 +277,7 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 	}
 
 	return slack.Attachment{
-		Text:   fmt.Sprintf("<%s|*%s*>", hook.URL, title),
+		Text:   fmt.Sprintf("<%s|*%s*>", html.EscapeString(hook.URL), html.EscapeString(title)),
 		Color:  "#f43f20",
 		Fields: fields,
 	}

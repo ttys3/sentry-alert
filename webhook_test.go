@@ -20,7 +20,7 @@ func TestSlackPostMessage(t *testing.T) {
 		TriggeringRules: nil,
 		Event: sentryEvent{
 			Culprit:     "createAttachment()",
-			Title:       "this is title",
+			Title:       "<this is 'title'>",
 			EventID:     "",
 			Environment: "develop",
 			Platform:    "go",

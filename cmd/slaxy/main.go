@@ -10,14 +10,9 @@ import (
 	"time"
 
 	"github.com/innogames/slaxy"
+	"github.com/innogames/slaxy/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-)
-
-var (
-	ServiceName string
-	Version     string
-	BuildTime   string
 )
 
 var (
@@ -34,7 +29,7 @@ var (
 		Long:    splash,
 		Short:   "Sentry webhooks to slack message converter proxy",
 		Run:     run,
-		Version: fmt.Sprintf("%s %s %s", ServiceName, Version, BuildTime),
+		Version: fmt.Sprintf("%s %s %s", version.ServiceName, version.Version, version.BuildTime),
 	}
 )
 

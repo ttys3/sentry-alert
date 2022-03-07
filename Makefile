@@ -4,7 +4,7 @@ COMMIT := $(shell git rev-parse --short HEAD| tr -d "[ \r\n\']")
 VERSION :=v$(TAG)-$(COMMIT)
 BUILD_TIME := $(shell date +%Y%m%d-%H%M%S)
 
-VERSION_PKG := main
+VERSION_PKG := github.com/innogames/slaxy/version
 LD_FLAGS := "-w -s -X $(VERSION_PKG).ServiceName=$(NAME) -X $(VERSION_PKG).Version=$(VERSION) -X $(VERSION_PKG).BuildTime=$(BUILD_TIME)"
 
 all: $(NAME)

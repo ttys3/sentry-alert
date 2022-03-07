@@ -3,7 +3,7 @@ package slaxy
 import (
 	"encoding/json"
 	"fmt"
-	"html"
+	"github.com/innogames/slaxy/version"
 	"io"
 	"net/http"
 	"strings"
@@ -278,9 +278,15 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 	}
 
 	return slack.Attachment{
-		Text:   fmt.Sprintf("<%s|*%s*>", html.EscapeString(hook.URL), html.EscapeString(title)),
+		Title:     title,
+		TitleLink: hook.URL,
+		// Text:   fmt.Sprintf("<%s|*%s*>", html.EscapeString(hook.URL), html.EscapeString(title)),
 		Color:  "#f43f20",
 		Fields: fields,
+		Footer: "Slaxy v" + version.Version,
+		// icon from https://github.com/getsentry
+		FooterIcon: "https://avatars.githubusercontent.com/u/1396951?s=200&v=4",
+		Ts:         json.Number(fmt.Sprint(time.Now().Unix())),
 	}
 }
 

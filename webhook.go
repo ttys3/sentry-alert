@@ -235,9 +235,10 @@ func (s *server) createAttachment(hook *webhook) slack.Attachment {
 	}
 
 	if len(hook.Event.Exception.Values) > 0 && len(hook.Event.Exception.Values[0].Stacktrace.Frames) > 0 {
+		frameLen := len(hook.Event.Exception.Values[0].Stacktrace.Frames)
 		fields = append(fields, slack.AttachmentField{
 			Title: "Stacktrace",
-			Value: hook.Event.Exception.Values[0].Stacktrace.Frames[0].String(),
+			Value: hook.Event.Exception.Values[0].Stacktrace.Frames[frameLen-1].String(),
 		})
 	}
 

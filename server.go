@@ -2,13 +2,13 @@ package slaxy
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"regexp"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/slack-go/slack"
 )
 
@@ -91,7 +91,7 @@ func (s *server) setup(addr string, handler handler) error {
 	// start tcp listener
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
-		return errors.Wrapf(err, "failed to listen on %s", addr)
+		return fmt.Errorf("failed to listen on %s, err: %w", addr, err)
 	}
 
 	s.logger.Info(fmt.Sprintf("Listening on %s", addr))
@@ -124,7 +124,7 @@ func (s *server) handleWeb(l net.Listener) {
 
 	// server closed abnormally
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		err = errors.Wrap(err, "server failed")
+		err = fmt.Errorf("server failed, err: %w", err)
 		s.errChan <- err
 	}
 }

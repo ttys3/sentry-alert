@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/sirupsen/logrus v1.8.1
-	github.com/slack-go/slack v0.10.2
+	github.com/slack-go/slack v0.12.3
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 )

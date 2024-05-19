@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:24.04
 
 COPY slaxy  /usr/local/bin/
 

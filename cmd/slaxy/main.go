@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -103,6 +104,7 @@ func loadConfig() {
 
 	v.SetEnvPrefix("SLAXY")
 	v.AutomaticEnv()
+	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
 	// read config
 	err = v.ReadInConfig()

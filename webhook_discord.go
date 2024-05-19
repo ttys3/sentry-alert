@@ -17,10 +17,10 @@ func (s *server) discordHandleHook(hook *webhook) error {
 	message := s.createDiscordMessage(hook)
 	res, err := s.client.R().SetBody(message).Post(s.cfg.DiscordWebhookURL)
 	if err != nil {
-		return fmt.Errorf("failed to send discord message: %w", err)
+		return fmt.Errorf("failed to send discord message, err=%w, message=%v", err, message)
 	}
 	if res.StatusCode() >= 300 {
-		return fmt.Errorf("failed to send discord message: %s", res.Body())
+		return fmt.Errorf("failed to send discord message, response_body=%s, message=%v", res.Body(), message)
 	}
 
 	return nil

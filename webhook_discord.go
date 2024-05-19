@@ -2,6 +2,7 @@ package slaxy
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -17,10 +18,12 @@ func (s *server) discordHandleHook(hook *webhook) error {
 	message := s.createDiscordMessage(hook)
 	res, err := s.client.R().SetBody(message).Post(s.cfg.DiscordWebhookURL)
 	if err != nil {
-		return fmt.Errorf("failed to send discord message, err=%w, message=%v", err, message)
+		message_json, _ := json.Marshal(message)
+		return fmt.Errorf("failed to send discord message, err=%w, message=%v", err, string(message_json))
 	}
 	if res.StatusCode() >= 300 {
-		return fmt.Errorf("failed to send discord message, response_body=%s, message=%v", res.Body(), message)
+		message_json, _ := json.Marshal(message)
+		return fmt.Errorf("failed to send discord message, response_body=%s, message=%v", res.Body(), string(message_json))
 	}
 
 	return nil

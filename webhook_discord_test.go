@@ -1,26 +1,26 @@
 package slaxy
 
 import (
+	"net"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/slack-go/slack"
 )
 
-func TestSlackPostMessage(t *testing.T) {
+func TestDiscordPostMessage(t *testing.T) {
 	hook := webhook{
 		ProjectName:     "demo-project",
 		Message:         "",
 		ID:              "007",
-		Culprit:         "createAttachment()",
+		Culprit:         "createMessage()",
 		ProjectSlug:     "demo-project",
 		URL:             "https://www.google.com/",
 		Level:           "error",
 		TriggeringRules: nil,
 		Event: sentryEvent{
-			Culprit:     "createAttachment()",
+			Culprit:     "createMessage()",
 			Title:       "<this is 'title'>",
 			EventID:     "",
 			Environment: "develop",
@@ -54,7 +54,7 @@ func TestSlackPostMessage(t *testing.T) {
 									Lineno:      168,
 									Filename:    "webhook.go",
 									ContextLine: `	if hook.Event.Timestamp != 0 {
-		fields = append(fields, slack.AttachmentField{
+		fields = append(fields, client.AttachmentField{
 			Title: "Timestamp",
 			Value: time.Unix(int64(int(hook.Event.Timestamp)), 0).Format(time.RFC3339),
 			Short: true,
@@ -76,10 +76,10 @@ func TestSlackPostMessage(t *testing.T) {
 	}
 
 	cfg := Config{
-		GracePeriod:    0,
-		Addr:           "",
-		SlackToken:     os.Getenv("SLAXY_TOKEN"),
-		ExcludedFields: nil,
+		GracePeriod:       0,
+		Addr:              "",
+		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		ExcludedFields:    nil,
 	}
 	s := &server{
 		cfg:     cfg,
@@ -87,12 +87,16 @@ func TestSlackPostMessage(t *testing.T) {
 		done:    make(chan struct{}, 1),
 		errChan: make(chan error, 100),
 	}
-	s.setup(":8080", nil)
-	attachment := s.createAttachment(&hook)
-	channel := os.Getenv("SLACK_CHANNEL")
-	channelID, timestamp, err := s.slack.PostMessage(channel, slack.MsgOptionAttachments(attachment))
+	s.setup(":8080", func(l net.Listener) {
+
+	})
+	attachment := s.createDiscordMessage(&hook)
+	res, err := s.client.R().SetBody(attachment).Post(s.cfg.DiscordWebhookURL)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("success, channelID=%v timestamp=%v", channelID, timestamp)
+	if res.StatusCode() >= 300 {
+		t.Fatal(res.Body())
+	}
+	t.Logf("success")
 }

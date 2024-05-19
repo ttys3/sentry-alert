@@ -3,8 +3,10 @@ module github.com/innogames/slaxy
 go 1.21
 
 require (
+	github.com/bwmarrin/discordgo v0.28.1
+	github.com/go-resty/resty/v2 v2.13.1
 	github.com/sirupsen/logrus v1.8.1
-	github.com/slack-go/slack v0.10.2
+	github.com/slack-go/slack v0.13.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 )
@@ -22,8 +24,10 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

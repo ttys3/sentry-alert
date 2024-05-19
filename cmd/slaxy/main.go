@@ -9,10 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/innogames/slaxy"
-	"github.com/innogames/slaxy/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/innogames/slaxy"
+	"github.com/innogames/slaxy/version"
 )
 
 var (
@@ -41,12 +42,14 @@ func init() {
 	slaxyCmd.PersistentFlags().StringP("addr", "a", ":3000", "listen address")
 	slaxyCmd.PersistentFlags().StringP("token", "t", "", "slack token")
 	slaxyCmd.PersistentFlags().StringP("channel", "n", "", "slack channel")
+	slaxyCmd.PersistentFlags().StringP("discord-webhook-url", "u", "", "discord webhook url")
 	slaxyCmd.PersistentFlags().StringSliceP("excluded-fields", "e", nil, "excluded sentry fields")
 
 	_ = v.BindPFlag("grace-period", slaxyCmd.PersistentFlags().Lookup("grace-period"))
 	_ = v.BindPFlag("addr", slaxyCmd.PersistentFlags().Lookup("addr"))
 	_ = v.BindPFlag("token", slaxyCmd.PersistentFlags().Lookup("token"))
 	_ = v.BindPFlag("channel", slaxyCmd.PersistentFlags().Lookup("channel"))
+	_ = v.BindPFlag("discord-webhook-url", slaxyCmd.PersistentFlags().Lookup("discord-webhook-url"))
 	_ = v.BindPFlag("excluded-fields", slaxyCmd.PersistentFlags().Lookup("excluded-fields"))
 }
 

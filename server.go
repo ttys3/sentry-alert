@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/slack-go/slack"
 )
 
@@ -16,10 +17,11 @@ type handler func(l net.Listener)
 
 // Config holds all config values
 type Config struct {
-	GracePeriod    time.Duration `mapstructure:"grace-period"`
-	Addr           string        `mapstructure:"addr"`
-	Token          string        `mapstructure:"token"`
-	ExcludedFields []string      `mapstructure:"excluded-fields"`
+	GracePeriod       time.Duration `mapstructure:"grace-period"`
+	Addr              string        `mapstructure:"addr"`
+	SlackToken        string        `mapstructure:"token"`
+	DiscordWebhookURL string        `mapstructure:"discord-webhook-url"`
+	ExcludedFields    []string      `mapstructure:"excluded-fields"`
 }
 
 // server types
@@ -30,6 +32,7 @@ type server struct {
 	srv            *http.Server
 	errChan        chan error
 	slack          *slack.Client
+	client         *resty.Client
 	excludedFields []*regexp.Regexp
 }
 
@@ -80,13 +83,25 @@ func (s *server) setup(addr string, handler handler) error {
 	}
 	s.excludedFields = excludedFields
 
-	// connect to slack
-	client := slack.New(s.cfg.Token)
-	_, err := client.AuthTest()
-	if err != nil {
-		return fmt.Errorf("slack auth failed, err=%w", err)
+	if s.cfg.SlackToken != "" {
+		client := slack.New(s.cfg.SlackToken)
+		_, err := client.AuthTest()
+		if err != nil {
+			return fmt.Errorf("slack auth failed, err=%w", err)
+		}
+		s.slack = client
 	}
-	s.slack = client
+
+	if s.cfg.DiscordWebhookURL != "" {
+		s.client = resty.New()
+		res, err := s.client.R().Get(s.cfg.DiscordWebhookURL)
+		if err != nil {
+			return fmt.Errorf("failed to check webhook connection err: %w", err)
+		}
+		if res.StatusCode() >= 300 {
+			return fmt.Errorf("failed to get webhook info: %s", res.Body())
+		}
+	}
 
 	// start tcp listener
 	l, err := net.Listen("tcp", addr)

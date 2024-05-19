@@ -38,6 +38,7 @@ grace-period: 60s
 addr: 127.0.0.1:3000
 token: xoxb-###-###-###
 channel: xxx
+discord-webhook-url: https://...
 excluded-fields:
   - ^sentry:.*$
 ```

@@ -37,8 +37,6 @@ func (s *server) createDiscordMessage(hook *webhook) discordgo.MessageSend {
 	fmt.Fprintf(buf, "### Project\n`%s`\n", hook.ProjectName)
 	fmt.Fprintf(buf, "### Level\n`%s`\n", hook.Level)
 
-	var fields []*discordgo.MessageEmbed
-
 	if hook.Event.Location != "" {
 		fmt.Fprintf(buf, "### Location\n`%s`\n", hook.Event.Location)
 	}
@@ -76,10 +74,7 @@ func (s *server) createDiscordMessage(hook *webhook) discordgo.MessageSend {
 		}
 
 		title := strings.Title(strings.ReplaceAll(tagKey, "_", " "))
-		fields = append(fields, &discordgo.MessageEmbed{
-			Title:       title,
-			Description: tagValue,
-		})
+		fmt.Fprintf(buf, "**%s**: `%s`\n", title, tagValue)
 	}
 
 	var title string
@@ -96,6 +91,5 @@ func (s *server) createDiscordMessage(hook *webhook) discordgo.MessageSend {
 
 	return discordgo.MessageSend{
 		Content: title + "\n" + buf.String(),
-		Embeds:  fields,
 	}
 }

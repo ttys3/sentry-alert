@@ -91,5 +91,11 @@ func (s *server) createDiscordMessage(hook *webhook) discordgo.MessageSend {
 
 	return discordgo.MessageSend{
 		Content: title + "\n" + buf.String(),
+		Embeds: []*discordgo.MessageEmbed{
+			&discordgo.MessageEmbed{
+				Title:       "Sentry",
+				Description: hook.URL,
+			},
+		},
 	}
 }

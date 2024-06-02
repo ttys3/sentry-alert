@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/innogames/slaxy/version"
 )
 
 func (s *server) discordHandleHook(hook *webhook) error {
@@ -94,7 +95,7 @@ func (s *server) createDiscordMessage(hook *webhook) discordgo.MessageSend {
 		Content: title + "\n" + buf.String(),
 		Embeds: []*discordgo.MessageEmbed{
 			{
-				Title:       "Sentry",
+				Title:       fmt.Sprintf("sentry-alert v%v", version.Version),
 				Description: hook.URL,
 			},
 		},

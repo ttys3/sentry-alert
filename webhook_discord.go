@@ -33,29 +33,24 @@ func (s *server) discordHandleHook(hook *webhook) error {
 func (s *server) createDiscordMessage(hook *webhook) discordgo.MessageSend {
 	buf := bytes.NewBuffer(nil)
 	// default fields
-	fmt.Fprintf(buf, "### Culprit\n`%s`\n", hook.Culprit)
-	fmt.Fprintf(buf, "### Project\n`%s`\n", hook.ProjectName)
-	fmt.Fprintf(buf, "### Level\n`%s`\n", hook.Level)
-
-	if hook.Event.Location != "" {
-		fmt.Fprintf(buf, "### Location\n`%s`\n", hook.Event.Location)
-	}
+	fmt.Fprintf(buf, "**Culprit** `%s`\n", hook.Culprit)
+	fmt.Fprintf(buf, "**Project** `%s`\n", hook.ProjectName)
+	fmt.Fprintf(buf, "**Level** `%s`\n", hook.Level)
 
 	if hook.Event.Timestamp != 0 {
-		fmt.Fprintf(buf, "### Timestamp `%s`\n", time.Unix(int64(int(hook.Event.Timestamp)), 0).Format(time.RFC3339))
+		fmt.Fprintf(buf, "**Timestamp** `%s`\n", time.Unix(int64(int(hook.Event.Timestamp)), 0).Format(time.RFC3339))
+	}
+
+	if hook.Event.Location != "" {
+		fmt.Fprintf(buf, "**Location** `%s`\n", hook.Event.Location)
 	}
 
 	if hook.Event.Environment != "" {
-		fmt.Fprintf(buf, "### Environment: `%s`\n", hook.Event.Environment)
+		fmt.Fprintf(buf, "**Environment** `%s`\n", hook.Event.Environment)
 	}
 
 	if hook.Event.Release != "" {
-		fmt.Fprintf(buf, "### Release\n`%s`\n", hook.Event.Release)
-	}
-
-	if len(hook.Event.Exception.Values) > 0 && len(hook.Event.Exception.Values[0].Stacktrace.Frames) > 0 {
-		frameLen := len(hook.Event.Exception.Values[0].Stacktrace.Frames)
-		fmt.Fprintf(buf, "### Stacktrace\n%s\n", hook.Event.Exception.Values[0].Stacktrace.Frames[frameLen-1].String())
+		fmt.Fprintf(buf, "**Release** `%s`\n", hook.Event.Release)
 	}
 
 	// put all sentry tags as attachment fields
@@ -89,10 +84,16 @@ func (s *server) createDiscordMessage(hook *webhook) discordgo.MessageSend {
 		title = fmt.Sprintf("[%s] %s", hook.Event.Location, hook.Event.Title)
 	}
 
+	if len(hook.Event.Exception.Values) > 0 && len(hook.Event.Exception.Values[0].Stacktrace.Frames) > 0 {
+		frameLen := len(hook.Event.Exception.Values[0].Stacktrace.Frames)
+		buf.WriteString("### Stacktrace\n")
+		buf.WriteString(hook.Event.Exception.Values[0].Stacktrace.Frames[frameLen-1].String())
+	}
+
 	return discordgo.MessageSend{
 		Content: title + "\n" + buf.String(),
 		Embeds: []*discordgo.MessageEmbed{
-			&discordgo.MessageEmbed{
+			{
 				Title:       "Sentry",
 				Description: hook.URL,
 			},
